@@ -63,7 +63,7 @@ const MOCK_CONTENT: ContentItem[] = [
 ];
 
 // Mock user uploads
-const MOCK_USER_UPLOADS = [
+const MOCK_USER_UPLOADS: ContentItem[] = [
   {
     id: '101',
     title: 'Computer Networks Study Guide',
@@ -91,7 +91,7 @@ const MOCK_USER_UPLOADS = [
 ];
 
 // Mock saved content
-const MOCK_SAVED_CONTENT = [
+const MOCK_SAVED_CONTENT: ContentItem[] = [
   MOCK_CONTENT[0],
   MOCK_CONTENT[1]
 ];
@@ -242,32 +242,31 @@ const UserDashboard = () => {
                   <p className="text-gray-600 text-sm">{user.email}</p>
                   
                   <div className="mt-6">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger 
-                        value="profile" 
-                        onClick={() => setActiveTab('profile')}
-                        className={activeTab === 'profile' ? 'bg-library-blue-100 text-library-blue-700' : ''}
-                      >
-                        <User className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline lg:hidden xl:inline">Profile</span>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="saved" 
-                        onClick={() => setActiveTab('saved')}
-                        className={activeTab === 'saved' ? 'bg-library-blue-100 text-library-blue-700' : ''}
-                      >
-                        <BookmarkIcon className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline lg:hidden xl:inline">Saved</span>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="uploads" 
-                        onClick={() => setActiveTab('uploads')}
-                        className={activeTab === 'uploads' ? 'bg-library-blue-100 text-library-blue-700' : ''}
-                      >
-                        <Upload className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline lg:hidden xl:inline">Uploads</span>
-                      </TabsTrigger>
-                    </TabsList>
+                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger 
+                          value="profile"
+                          className={activeTab === 'profile' ? 'bg-library-blue-100 text-library-blue-700' : ''}
+                        >
+                          <User className="h-4 w-4 mr-1" />
+                          <span className="hidden sm:inline lg:hidden xl:inline">Profile</span>
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="saved"
+                          className={activeTab === 'saved' ? 'bg-library-blue-100 text-library-blue-700' : ''}
+                        >
+                          <BookmarkIcon className="h-4 w-4 mr-1" />
+                          <span className="hidden sm:inline lg:hidden xl:inline">Saved</span>
+                        </TabsTrigger>
+                        <TabsTrigger 
+                          value="uploads"
+                          className={activeTab === 'uploads' ? 'bg-library-blue-100 text-library-blue-700' : ''}
+                        >
+                          <Upload className="h-4 w-4 mr-1" />
+                          <span className="hidden sm:inline lg:hidden xl:inline">Uploads</span>
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                   </div>
                 </CardContent>
               </Card>
@@ -300,7 +299,205 @@ const UserDashboard = () => {
                 </CardHeader>
                 
                 <CardContent>
-                  {/* Profile Tab Content */}
+                  <Tabs value={activeTab} className="hidden">
+                    <TabsContent value="profile">
+                      {/* Profile Tab Content */}
+                      <form onSubmit={handleProfileUpdate}>
+                        <div className="space-y-4">
+                          <div className="flex justify-end">
+                            {isEditing ? (
+                              <div className="space-x-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => setIsEditing(false)}
+                                  className="text-gray-600"
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  type="submit"
+                                  disabled={isSaving}
+                                >
+                                  {isSaving ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Saving...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Save className="mr-2 h-4 w-4" />
+                                      Save Changes
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setIsEditing(true)}
+                                className="text-library-blue-700 border-library-blue-200"
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit Profile
+                              </Button>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input
+                              id="name"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                              disabled={!isEditing}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                              id="email"
+                              value={user.email}
+                              disabled
+                              className="bg-gray-50"
+                            />
+                            <p className="text-xs text-gray-500">
+                              Email address cannot be changed
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="institution">School/University</Label>
+                            <Input
+                              id="institution"
+                              value={institution}
+                              onChange={(e) => setInstitution(e.target.value)}
+                              placeholder="e.g., University of Technology"
+                              disabled={!isEditing}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="interests">Areas of Interest</Label>
+                            <Input
+                              id="interests"
+                              value={interests}
+                              onChange={(e) => setInterests(e.target.value)}
+                              placeholder="e.g., Mathematics, Computer Science, Physics"
+                              disabled={!isEditing}
+                            />
+                            <p className="text-xs text-gray-500">
+                              Separate multiple interests with commas
+                            </p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="profilePicture">Profile Picture</Label>
+                            <div className="flex items-center space-x-4">
+                              <Avatar className="h-16 w-16">
+                                <AvatarImage src={user.profilePicture} alt={user.name} />
+                                <AvatarFallback className="bg-library-blue-100 text-library-blue-700 text-xl">
+                                  {user.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              
+                              {isEditing && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className="text-gray-700"
+                                  disabled={!isEditing}
+                                >
+                                  Change Picture
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </TabsContent>
+                    
+                    <TabsContent value="saved">
+                      {/* Saved Materials Tab Content */}
+                      <div>
+                        {savedContent.length === 0 ? (
+                          <div className="text-center py-12">
+                            <BookmarkIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No saved materials yet</h3>
+                            <p className="text-gray-500 max-w-md mx-auto mb-6">
+                              Materials you save will appear here for quick access.
+                            </p>
+                            <Button 
+                              onClick={() => navigate('/dashboard')} 
+                              className="bg-library-blue-700 hover:bg-library-blue-800"
+                            >
+                              Browse Library
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {savedContent.map((content) => (
+                              <ContentCard
+                                key={content.id}
+                                content={content}
+                                isSaved={true}
+                                onSave={() => handleRemoveSaved(content.id)}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="uploads">
+                      {/* Your Uploads Tab Content */}
+                      <div>
+                        {userUploads.length === 0 ? (
+                          <div className="text-center py-12">
+                            <Upload className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No uploads yet</h3>
+                            <p className="text-gray-500 max-w-md mx-auto mb-6">
+                              Share your knowledge with the community by uploading study materials.
+                            </p>
+                            <Button 
+                              onClick={() => navigate('/upload')} 
+                              className="bg-library-blue-700 hover:bg-library-blue-800"
+                            >
+                              Upload Your First Resource
+                            </Button>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="flex justify-between items-center mb-4">
+                              <h3 className="text-lg font-medium text-gray-900">
+                                Your Uploaded Resources
+                              </h3>
+                              <Button 
+                                onClick={() => navigate('/upload')} 
+                                size="sm"
+                              >
+                                <Upload className="mr-2 h-4 w-4" />
+                                New Upload
+                              </Button>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {userUploads.map((content) => (
+                                <ContentCard
+                                  key={content.id}
+                                  content={content}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                  
+                  {/* Conditionally render content based on activeTab */}
                   {activeTab === 'profile' && (
                     <form onSubmit={handleProfileUpdate}>
                       <div className="space-y-4">
@@ -419,7 +616,6 @@ const UserDashboard = () => {
                     </form>
                   )}
                   
-                  {/* Saved Materials Tab Content */}
                   {activeTab === 'saved' && (
                     <div>
                       {savedContent.length === 0 ? (
@@ -451,7 +647,6 @@ const UserDashboard = () => {
                     </div>
                   )}
                   
-                  {/* Your Uploads Tab Content */}
                   {activeTab === 'uploads' && (
                     <div>
                       {userUploads.length === 0 ? (
